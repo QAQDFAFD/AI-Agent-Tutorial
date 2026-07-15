@@ -1,5 +1,5 @@
 [project]
-name = "ai-agent-tutor"
+name = "ai-agent-tutorial"
 version = "0.1.0"
 description = "一套从原理到生产的 Python AI Agent 中文教程与可运行 Demo"
 readme = "README.md"

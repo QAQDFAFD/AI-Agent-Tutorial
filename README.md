@@ -1,4 +1,4 @@
-# AI Agent Tutor：Python AI Agent 从入门到生产
+# AI Agent Tutorial：Python AI Agent 从入门到生产
 
 这不是一份“把 LangChain 方法名抄一遍”的手册，而是一条从原理、代码到生产实践的完整学习路线。你会先亲手写一个几十行的 Agent Loop，再使用 LangChain 快速组装 Agent，最后用 LangGraph 构建有状态、可暂停、可恢复、可评测的工作流。
 
