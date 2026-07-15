@@ -1,0 +1,9 @@
+flowchart LR
+  subgraph HOST["MCP Host（聊天应用 / IDE / 你的 Agent 服务）"]
+    C1["MCP Client 1<br/>一个连接一个客户端"]
+    C2["MCP Client 2"]
+  end
+  C1 <-->|"stdio（本地进程）"| S1["MCP Server A<br/>Tools / Resources / Prompts"]
+  C2 <-->|"Streamable HTTP（远程）"| S2["MCP Server B<br/>Tools / Resources / Prompts"]
+  S1 --> D1[("本地文件 / 数据库")]
+  S2 --> D2[("SaaS API")]

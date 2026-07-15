@@ -1,0 +1,13 @@
+flowchart LR
+  S((START)) --> C["classify：更新 intent"]
+  C --> R{"route：读取 state"}
+  R -->|"knowledge"| K["knowledge：检索知识"]
+  R -->|"account"| A["account：查询账户"]
+  R -->|"other"| G["general：通用回答"]
+  K --> Q["quality_check"]
+  A --> Q
+  G --> Q
+  Q -->|"合格"| E((END))
+  Q -->|"需要改写"| W["rewrite"]
+  W --> E
+

@@ -1,0 +1,15 @@
+stateDiagram-v2
+  [*] --> Classify
+  Classify --> RetrieveFAQ: knowledge
+  Classify --> LookupOrder: order
+  Classify --> PrepareRefund: refund
+  Classify --> General: other
+  PrepareRefund --> AwaitApproval: amount > 0
+  AwaitApproval --> ExecuteRefund: approve
+  AwaitApproval --> Rejected: reject
+  RetrieveFAQ --> Compose
+  LookupOrder --> Compose
+  ExecuteRefund --> Compose
+  Rejected --> Compose
+  General --> Compose
+  Compose --> [*]

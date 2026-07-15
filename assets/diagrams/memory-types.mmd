@@ -1,0 +1,17 @@
+flowchart TD
+  subgraph RUN["生命周期：一次运行"]
+    ST["当前状态 State<br/>当前步骤、已调用工具"]
+  end
+  subgraph THREAD["生命周期：一个会话 thread"]
+    SM["短期记忆<br/>Checkpointer：最近对话、阶段摘要"]
+  end
+  subgraph USERSCOPE["生命周期：跨会话（同一用户）"]
+    LM["长期记忆<br/>Store / 业务数据库：偏好、稳定事实"]
+  end
+  subgraph SHARED["生命周期：多用户共享"]
+    KB["知识库<br/>搜索 / 向量索引：手册、政策"]
+  end
+  ST -->|"thread 结束时保留必要内容"| SM
+  SM -->|"抽取 + 审核后写入"| LM
+  LM -.->|"按需注入上下文"| ST
+  KB -.->|"检索后注入上下文"| ST

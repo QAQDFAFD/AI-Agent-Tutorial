@@ -1,0 +1,16 @@
+flowchart LR
+  subgraph Offline["离线建库"]
+    D["原始文档"] --> C["清洗与切块"]
+    C --> X["Embedding / 关键词索引"]
+    X --> V[("向量库 / 搜索索引")]
+  end
+  subgraph Online["在线问答"]
+    Q["用户问题"] --> QR["查询改写"]
+    QR --> V
+    V --> R["召回候选"]
+    R --> RR["过滤与重排"]
+    RR --> P["上下文 + 引用"]
+    P --> L["模型生成"]
+    L --> A["有依据的回答"]
+  end
+

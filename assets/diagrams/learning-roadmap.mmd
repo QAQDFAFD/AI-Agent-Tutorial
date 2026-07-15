@@ -1,0 +1,14 @@
+flowchart LR
+  A["Python / HTTP / JSON / asyncio"] --> B["LLM、消息与 Prompt"]
+  B --> C["结构化输出与 Tool Calling"]
+  C --> D["手写 Agent Loop"]
+  D --> E["LangChain：快速组装"]
+  D --> F["LangGraph：状态与编排"]
+  E --> G["RAG、记忆与上下文工程"]
+  F --> G
+  G --> H["HITL、MCP 与多 Agent"]
+  H --> I["测试、评测与可观测性"]
+  I --> J["FastAPI、持久化与部署"]
+  classDef core fill:#fff3e0,stroke:#f97316,stroke-width:3px,color:#111
+  class C,D,F,I core
+

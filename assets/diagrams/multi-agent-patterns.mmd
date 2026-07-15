@@ -1,0 +1,19 @@
+flowchart TD
+  subgraph R["模式一：Router（互斥领域）"]
+    U1["用户"] --> RT["Router 只做分类"]
+    RT --> E1["技术专家"]
+    RT --> E2["账单专家"]
+    RT --> E3["售后专家"]
+  end
+  subgraph S["模式二：Supervisor（拆分子任务）"]
+    U2["用户"] --> SP["主管：保留控制权并汇总"]
+    SP -->|"委派"| W1["专家 A"]
+    SP -->|"委派"| W2["专家 B"]
+    W1 -->|"结构化结果"| SP
+    W2 -->|"结构化结果"| SP
+  end
+  subgraph H["模式三：Handoff（移交控制权）"]
+    U3["用户"] --> A1["Agent A"]
+    A1 -->|"移交会话控制权"| A2["Agent B"]
+    A2 --> DONE["直接答复用户"]
+  end

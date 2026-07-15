@@ -1,0 +1,9 @@
+flowchart LR
+  DS["离线数据集<br/>20–50 条起步，版本化"] --> EV["离线评测<br/>比较新旧版本"]
+  EV -->|"通过门槛"| CANARY["小流量灰度上线"]
+  EV -->|"未通过"| FIX["修复 Prompt / 检索 / 工具 / 图"]
+  FIX --> EV
+  CANARY --> MON["在线监控与用户反馈"]
+  MON --> PICK["挑选失败 Trace"]
+  PICK --> LABEL["人工标注与隐私清洗"]
+  LABEL -->|"回流为回归样例"| DS

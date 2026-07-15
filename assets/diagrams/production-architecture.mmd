@@ -1,0 +1,14 @@
+flowchart TB
+  Client["Web / App / SDK"] --> API["FastAPI Gateway"]
+  API --> Auth["身份、限流、配额"]
+  Auth --> Queue["任务队列 / 流式通道"]
+  Queue --> Worker["Agent Worker"]
+  Worker --> Model["模型服务"]
+  Worker --> Tools["受控业务工具"]
+  Worker --> Retrieval["检索服务"]
+  Worker --> State[("PostgreSQL / Checkpoints")]
+  Worker --> Cache[("Redis / Cache")]
+  Worker --> Trace["Tracing / Metrics / Evals"]
+  Tools --> Approval["人工审批 / 审计"]
+  Approval --> Worker
+

@@ -1,0 +1,11 @@
+flowchart TD
+  Q["用户输入"] --> M["调用模型"]
+  M -->|"任务：给出最终结构化答案"| SO["Structured Output<br/>模型按 schema 返回 JSON"]
+  SO --> V["Pydantic 校验"]
+  V -->|"通过"| DONE["程序直接使用结果<br/>（本轮模型工作结束）"]
+  V -->|"失败"| RETRY["把精简校验错误反馈模型<br/>最多纠正一次"]
+  RETRY --> M
+  M -->|"任务：需要调用外部能力"| TC["Tool Calling<br/>模型返回工具名 + 参数"]
+  TC --> EX["程序校验并执行工具"]
+  EX --> OBS["observation 回传模型"]
+  OBS --> M

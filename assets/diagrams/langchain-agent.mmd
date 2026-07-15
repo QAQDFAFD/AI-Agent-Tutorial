@@ -1,0 +1,8 @@
+flowchart TD
+  IN["用户消息"] --> MW1["Middleware：调模型前<br/>裁剪消息 / 注入用户上下文"]
+  MW1 --> MODEL["模型节点<br/>决定调用工具还是给最终回答"]
+  MODEL -->|"提出 tool_calls"| MW2["Middleware：工具调用前<br/>日志 / 权限 / 限速"]
+  MW2 --> TOOLS["工具节点<br/>执行 @tool 函数"]
+  TOOLS -->|"observation"| MODEL
+  MODEL -->|"最终回答"| FMT["response_format<br/>解析为 Pydantic 对象"]
+  FMT --> OUT["result[&quot;structured_response&quot;]"]
