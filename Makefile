@@ -1,4 +1,4 @@
-.PHONY: setup test lint offline-demo graph-demo rag-demo eval-demo service capstone
+.PHONY: setup test lint offline-demo graph-demo rag-demo eval-demo service capstone tutor
 
 setup:
 	uv sync
@@ -26,4 +26,7 @@ service:
 
 capstone:
 	uv run python -m demos.11_capstone_helpdesk.main
+
+tutor:
+	uv run uvicorn tutor.api.app:app --reload
 
