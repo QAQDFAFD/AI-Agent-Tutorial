@@ -78,6 +78,81 @@ function threadId() {
   return id;
 }
 
+/* ---------- 轻量 Markdown 渲染（先转义再渲染，防止模型输出注入 HTML） ---------- */
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function renderInline(text) {
+  return text
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(
+      /\[([^\]]+)\]\((https?:\/\/[^)\s]+|#[^)\s]*)\)/g,
+      '<a href="$2" target="_blank" rel="noopener">$1</a>'
+    );
+}
+
+function renderBlocks(text) {
+  let html = "";
+  let list = null;
+  const closeList = () => {
+    if (list) {
+      html += `</${list}>`;
+      list = null;
+    }
+  };
+  for (const line of text.split("\n")) {
+    const heading = line.match(/^#{1,6}\s+(.*)/);
+    const bullet = line.match(/^\s*[-*]\s+(.*)/);
+    const numbered = line.match(/^\s*\d+[.)]\s+(.*)/);
+    const quote = line.match(/^&gt;\s?(.*)/);
+    if (heading) {
+      closeList();
+      html += `<h4>${renderInline(heading[1])}</h4>`;
+    } else if (quote) {
+      closeList();
+      html += `<blockquote>${renderInline(quote[1])}</blockquote>`;
+    } else if (/^\s*(---+|\*\*\*+)\s*$/.test(line)) {
+      closeList();
+      html += "<hr>";
+    } else if (bullet) {
+      if (list !== "ul") { closeList(); html += "<ul>"; list = "ul"; }
+      html += `<li>${renderInline(bullet[1])}</li>`;
+    } else if (numbered) {
+      if (list !== "ol") { closeList(); html += "<ol>"; list = "ol"; }
+      html += `<li>${renderInline(numbered[1])}</li>`;
+    } else if (line.trim() === "") {
+      closeList();
+    } else {
+      closeList();
+      html += `<p>${renderInline(line)}</p>`;
+    }
+  }
+  closeList();
+  return html;
+}
+
+function renderMarkdown(source) {
+  // 偶数段是普通文本，奇数段是 ``` 围栏代码块（流式中未闭合的围栏也按代码块渲染）
+  const parts = source.split("```");
+  let html = "";
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 1) {
+      const code = parts[i].replace(/^[\w+-]*\n?/, "");
+      html += `<pre><code>${escapeHtml(code)}</code></pre>`;
+    } else {
+      html += renderBlocks(escapeHtml(parts[i]));
+    }
+  }
+  return html;
+}
+
 function appendMessage(className, text) {
   const element = document.createElement("div");
   element.className = `msg ${className}`;
@@ -141,6 +216,7 @@ async function sendMessage(text) {
   appendMessage("user", text);
   const status = appendMessage("status", "思考中…");
   let answer = null;
+  let answerText = "";
 
   try {
     const response = await fetch("/api/chat", {
@@ -172,7 +248,8 @@ async function sendMessage(text) {
           data.tool === "search_tutorial" ? "正在查阅教程…" : "正在整理章节目录…";
       } else if (event === "token") {
         if (!answer) answer = appendMessage("assistant", "");
-        answer.textContent += data.delta;
+        answerText += data.delta;
+        answer.innerHTML = renderMarkdown(answerText);
         chatMessages.scrollTop = chatMessages.scrollHeight;
       } else if (event === "sources") {
         appendSources(data);

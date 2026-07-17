@@ -204,12 +204,42 @@ body {
   padding: 0.55rem 0.8rem;
   border-radius: 12px;
   font-size: 0.88rem;
-  white-space: pre-wrap;
   word-break: break-word;
 }
 
-.msg.user { align-self: flex-end; background: var(--accent); color: #fff; }
+.msg.user { align-self: flex-end; background: var(--accent); color: #fff; white-space: pre-wrap; }
 .msg.assistant { align-self: flex-start; background: #f4f4f5; }
+
+/* 助手消息里渲染出的 Markdown 元素 */
+.msg.assistant p { margin: 0.35rem 0; }
+.msg.assistant h4 { margin: 0.7rem 0 0.3rem; font-size: 0.92rem; }
+.msg.assistant ul, .msg.assistant ol { margin: 0.35rem 0; padding-left: 1.2rem; }
+.msg.assistant li { margin: 0.15rem 0; }
+.msg.assistant hr { border: none; border-top: 1px solid var(--border); margin: 0.6rem 0; }
+.msg.assistant blockquote {
+  margin: 0.4rem 0;
+  padding: 0.3rem 0.6rem;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 6px 6px 0;
+}
+.msg.assistant pre {
+  background: #18181b;
+  color: #e4e4e7;
+  padding: 0.6rem 0.7rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  margin: 0.4rem 0;
+}
+.msg.assistant :not(pre) > code {
+  background: #e4e4e7;
+  border-radius: 4px;
+  padding: 0.05rem 0.3rem;
+  font-size: 0.82em;
+}
+.msg.assistant a { color: var(--accent); }
 .msg.status { align-self: flex-start; color: var(--muted); font-size: 0.8rem; padding: 0 0.2rem; }
 .msg.error { align-self: flex-start; background: #fef2f2; color: #b91c1c; }
 
