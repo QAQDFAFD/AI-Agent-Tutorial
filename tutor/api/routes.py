@@ -23,19 +23,24 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
 
 
+REPO_URL = "https://github.com/QAQDFAFD/AI-Agent-Tutorial"
+
+
 def _rewrite_links(html: str) -> str:
-    html = html.replace('src="../assets/', 'src="/assets/').replace('src="assets/', 'src="/assets/')
-    # demos 目录链接改写为站内 Demo 源码查看页
-    html = re.sub(r'href="(?:\.\./)?demos/([\w-]+)/[\w.-]*"', r'href="#/demo/\1"', html)
+    html = re.sub(r'src="(?:\.\./)*assets/', 'src="/assets/', html)
+    # demos 目录链接改写为站内 Demo 源码查看页（demo README 里是 ../../demos/ 两级相对路径）
+    html = re.sub(r'href="(?:\.\./)*demos/([\w-]+)/[\w.-]*"', r'href="#/demo/\1"', html)
 
     def to_route(match: re.Match) -> str:
         name = match.group(1)
         numbered = re.match(r"^(\d{2})-", name)
         return f'href="#/chapter/{numbered.group(1) if numbered else name}"'
 
-    return re.sub(
-        r'href="(?!https?://)(?:\.\./)?(?:docs/)?([\w.-]+?)\.md(?:#[^"]*)?"', to_route, html
+    html = re.sub(
+        r'href="(?!https?://)(?:\.\./)*(?:docs/)?([\w.-]+?)\.md(?:#[^"]*)?"', to_route, html
     )
+    # 剩余的仓库内相对链接（如 ../tutor/）指向 GitHub 源码
+    return re.sub(r'href="(?:\.\./)+([^"]+)"', rf'href="{REPO_URL}/tree/main/\1"', html)
 
 
 def render_chapter_html(chapter: Chapter) -> str:

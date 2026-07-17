@@ -23,6 +23,5 @@ class Settings(BaseSettings):
     cache_dir: Path = Path("var")
 
     top_k: int = 4
-    max_message_length: int = 2000
     agent_recursion_limit: int = 10
     request_timeout_seconds: float = 60.0

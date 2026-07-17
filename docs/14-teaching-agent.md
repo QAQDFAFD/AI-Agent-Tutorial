@@ -100,7 +100,7 @@ async for mode, event in agent.astream(inputs, config, stream_mode=["updates", "
 
 错误处理同样分层（第 10 章）：超时（`asyncio.timeout`）、递归上限（`GraphRecursionError`，防失控循环烧钱）、未知异常，各自翻译成对用户有意义的中文 `error` 事件；堆栈只进服务端日志。
 
-## 14.6 测试策略：36 个测试，0 次真实 API 调用
+## 14.6 测试策略：全套测试，0 次真实 API 调用
 
 `tests/test_tutor_*.py` 展示了分层结构怎么换来可测试性：
 

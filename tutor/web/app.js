@@ -24,8 +24,13 @@ async function loadChapters() {
 function currentRoute() {
   const demo = location.hash.match(/^#\/demo\/([\w-]+)/);
   if (demo) return { kind: "demo", id: demo[1] };
-  const chapter = location.hash.match(/^#\/chapter\/([\w.-]+)/);
-  return { kind: "chapter", id: chapter ? chapter[1] : "00" };
+  // 形如 #/chapter/05#锚点：锚点由路由统一携带，避免多处各自渲染产生竞态
+  const chapter = location.hash.match(/^#\/chapter\/([\w.-]+)(?:#(.+))?/);
+  return {
+    kind: "chapter",
+    id: chapter ? chapter[1] : "00",
+    anchor: chapter && chapter[2] ? decodeURIComponent(chapter[2]) : null,
+  };
 }
 
 function highlightCode(container) {
@@ -58,11 +63,11 @@ function renderChapter(chapterId, anchor) {
 }
 
 function route() {
-  const { kind, id } = currentRoute();
+  const { kind, id, anchor } = currentRoute();
   if (kind === "demo") {
     renderPage(`/api/demos/${encodeURIComponent(id)}`, null);
   } else {
-    renderChapter(id);
+    renderChapter(id, anchor);
   }
 }
 
@@ -189,8 +194,12 @@ function appendSources(sources) {
     chip.className = "source-chip";
     chip.textContent = `第 ${source.chapter_id} 章 · ${source.heading}`;
     chip.addEventListener("click", () => {
-      location.hash = `#/chapter/${source.chapter_id}`;
-      renderChapter(source.chapter_id, source.anchor);
+      const target = `#/chapter/${source.chapter_id}#${encodeURIComponent(source.anchor)}`;
+      if (location.hash === target) {
+        renderChapter(source.chapter_id, source.anchor); // hash 不变时 hashchange 不触发
+      } else {
+        location.hash = target; // 触发 hashchange，由 route() 统一渲染，避免双重 fetch 竞态
+      }
     });
     wrap.appendChild(chip);
   }

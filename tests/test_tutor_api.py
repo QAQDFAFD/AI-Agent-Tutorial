@@ -95,6 +95,21 @@ def test_chapter_demo_links_rewritten_to_demo_route():
         assert "../demos/" not in html
 
 
+def test_demo_page_rewrites_two_level_docs_links():
+    with TestClient(create_app(_settings(), agent=FakeAgent())) as client:
+        html = client.get("/api/demos/01_agent_loop").json()["html"]
+        # demo README 里的 ../../docs/01-xxx.md 应改写为站内章节路由
+        assert 'href="#/chapter/01"' in html
+        assert "../../docs/" not in html
+
+
+def test_repo_relative_links_point_to_github():
+    with TestClient(create_app(_settings(), agent=FakeAgent())) as client:
+        html = client.get("/api/chapters/14").json()["html"]
+        assert 'href="https://github.com/' in html
+        assert 'href="../tutor/"' not in html
+
+
 def test_chat_streams_expected_event_sequence():
     with (
         TestClient(create_app(_settings(), agent=FakeAgent())) as client,
