@@ -39,7 +39,7 @@ flowchart LR
         factory["app：应用工厂 + lifespan 装配"]
     end
     subgraph agent["tutor/agent"]
-        graph["create_agent + InMemorySaver"]
+        agent_graph["create_agent + InMemorySaver"]
         tools["search_tutorial / get_outline"]
     end
     subgraph rag["tutor/rag"]
