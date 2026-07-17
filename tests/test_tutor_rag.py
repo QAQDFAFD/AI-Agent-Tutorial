@@ -3,7 +3,7 @@ import zlib
 from pathlib import Path
 
 from tutor.ingest.chunker import Chunk
-from tutor.rag.embeddings import CachedEmbeddingClient
+from tutor.rag.embeddings import CachedEmbeddingClient, HashEmbeddingClient
 from tutor.rag.retriever import Retriever
 
 
@@ -37,6 +37,12 @@ def test_retriever_hits_expected_chunk():
     retriever = Retriever.build(FakeEmbeddingClient(), CHUNKS, top_k=2)
     hits = retriever.search("checkpointer 怎么恢复 thread")
     assert hits[0].chunk.chapter_id == "05"
+
+
+def test_hash_embedding_client_retrieves_relevant_chunk():
+    retriever = Retriever.build(HashEmbeddingClient(), CHUNKS, top_k=1)
+    assert retriever.search("checkpointer 怎么恢复")[0].chunk.chapter_id == "05"
+    assert retriever.search("退款怎么防止重复")[0].chunk.chapter_id == "10"
 
 
 def test_cached_client_skips_repeat_calls(tmp_path: Path):

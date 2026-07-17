@@ -16,6 +16,16 @@ uv run uvicorn tutor.api.app:app --reload
 - **不配置 `OPENAI_API_KEY`**：阅读站点完全可用，聊天输入框禁用并显示配置指引（优雅降级）。
 - **配置了 Key**：首次启动会对全部章节切块并调用 Embedding 建索引（约 300 块，一次性成本），
   向量缓存在 `var/embeddings-cache.json`，之后重启秒级完成。
+- **用 DeepSeek 等无 embedding 接口的服务商**：在 `.env` 中设置
+  `TUTOR_EMBEDDING_PROVIDER=hash`，检索改用本地字符 n-gram 哈希向量（零成本零网络，
+  质量略低于真 Embedding，但对中文字面匹配足够可用）：
+
+```bash
+OPENAI_API_KEY=sk-...           # DeepSeek 的 key
+OPENAI_BASE_URL=https://api.deepseek.com
+OPENAI_MODEL=deepseek-chat
+TUTOR_EMBEDDING_PROVIDER=hash
+```
 
 ## 架构
 

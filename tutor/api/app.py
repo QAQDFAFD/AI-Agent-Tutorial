@@ -14,11 +14,26 @@ from tutor.api.routes import router
 from tutor.config import Settings
 from tutor.ingest.chunker import split_chapter
 from tutor.ingest.loader import load_chapters
-from tutor.rag.embeddings import CachedEmbeddingClient, OpenAIEmbeddingClient
+from tutor.rag.embeddings import (
+    CachedEmbeddingClient,
+    EmbeddingClient,
+    HashEmbeddingClient,
+    OpenAIEmbeddingClient,
+)
 from tutor.rag.retriever import Retriever
 
 logger = logging.getLogger(__name__)
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
+
+
+def _build_embeddings(settings: Settings) -> EmbeddingClient:
+    if settings.tutor_embedding_provider == "hash":
+        return HashEmbeddingClient()
+    return CachedEmbeddingClient(
+        OpenAIEmbeddingClient(settings),
+        settings.cache_dir / "embeddings-cache.json",
+        model_tag=settings.tutor_embedding_model,
+    )
 
 
 def create_app(settings: Settings | None = None, *, agent=None) -> FastAPI:
@@ -37,11 +52,7 @@ def create_app(settings: Settings | None = None, *, agent=None) -> FastAPI:
         else:
             try:
                 chunks = [c for chapter in app.state.chapters for c in split_chapter(chapter)]
-                embeddings = CachedEmbeddingClient(
-                    OpenAIEmbeddingClient(app_settings),
-                    app_settings.cache_dir / "embeddings-cache.json",
-                    model_tag=app_settings.tutor_embedding_model,
-                )
+                embeddings = _build_embeddings(app_settings)
                 retriever = Retriever.build(embeddings, chunks, app_settings.top_k)
                 app.state.agent = build_agent(app_settings, retriever, app.state.chapters)
                 logger.info(
