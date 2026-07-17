@@ -104,14 +104,17 @@ body {
 .chapter-body a { color: var(--accent); }
 
 .chapter-body pre {
-  background: #18181b;
-  color: #e4e4e7;
+  background: #0d1117; /* 与 highlight.js github-dark 主题一致 */
+  color: #c9d1d9;
   padding: 0.9rem 1rem;
   border-radius: var(--radius);
   overflow-x: auto;
   font-size: 0.85rem;
   line-height: 1.55;
 }
+
+/* 主题自带的块级内边距与底色由外层 pre 承担，避免叠加 */
+pre code.hljs { padding: 0; background: transparent; }
 
 .chapter-body code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 .chapter-body :not(pre) > code {
@@ -224,8 +227,8 @@ body {
   border-radius: 0 6px 6px 0;
 }
 .msg.assistant pre {
-  background: #18181b;
-  color: #e4e4e7;
+  background: #0d1117;
+  color: #c9d1d9;
   padding: 0.6rem 0.7rem;
   border-radius: 8px;
   overflow-x: auto;

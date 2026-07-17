@@ -28,6 +28,13 @@ function currentRoute() {
   return { kind: "chapter", id: chapter ? chapter[1] : "00" };
 }
 
+function highlightCode(container) {
+  if (!window.hljs) return;
+  for (const block of container.querySelectorAll("pre code")) {
+    hljs.highlightElement(block);
+  }
+}
+
 async function renderPage(url, activeChapterId, anchor) {
   const response = await fetch(url);
   if (!response.ok) {
@@ -36,6 +43,7 @@ async function renderPage(url, activeChapterId, anchor) {
   }
   const page = await response.json();
   chapterBody.innerHTML = page.html;
+  highlightCode(chapterBody);
   for (const link of chapterList.querySelectorAll("a")) {
     link.classList.toggle("active", link.dataset.chapterId === activeChapterId);
   }
@@ -264,6 +272,9 @@ async function sendMessage(text) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
       } else if (event === "sources") {
         appendSources(data);
+      } else if (event === "final") {
+        // 流式期间不高亮（每个 token 都重建 DOM），结束后一次性高亮
+        if (answer) highlightCode(answer);
       } else if (event === "error") {
         appendMessage("error", data.message);
       }
