@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Python AI Agent 教程</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <button id="sidebar-toggle" class="sidebar-toggle" aria-label="切换目录">☰</button>
+    <h1 class="site-title">Python AI Agent 教程</h1>
+    <span class="site-subtitle">从原理、代码到生产实践</span>
+  </header>
+
+  <div class="layout">
+    <nav id="sidebar" class="sidebar">
+      <p class="sidebar-heading">章节目录</p>
+      <ul id="chapter-list" class="chapter-list"></ul>
+    </nav>
+    <main class="content">
+      <article id="chapter-body" class="chapter-body">
+        <p class="loading">正在加载章节…</p>
+      </article>
+    </main>
+  </div>
+
+  <button id="chat-toggle" class="chat-toggle" aria-label="打开教学助手">💬</button>
+
+  <section id="chat-panel" class="chat-panel hidden" aria-label="教学助手">
+    <header class="chat-header">
+      <span>教学助手</span>
+      <button id="chat-close" class="chat-close" aria-label="关闭">×</button>
+    </header>
+    <div id="chat-messages" class="chat-messages">
+      <div class="msg assistant">
+        你好！我是本教程的教学助手。可以问我教程里的任何内容，例如
+        "checkpoint 是什么？"或"我该按什么顺序学习？"——我会带着章节引用回答。
+      </div>
+    </div>
+    <form id="chat-form" class="chat-form">
+      <input id="chat-input" type="text" placeholder="问我教程里的问题…"
+             maxlength="2000" autocomplete="off" />
+      <button id="chat-send" type="submit">发送</button>
+    </form>
+  </section>
+
+  <noscript><p style="padding:1rem">本站点需要启用 JavaScript。</p></noscript>
+  <script src="/app.js"></script>
+</body>
+</html>

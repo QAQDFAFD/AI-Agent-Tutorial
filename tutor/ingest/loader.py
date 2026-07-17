@@ -27,9 +27,20 @@ def _chapter_title(markdown: str, fallback: str) -> str:
     return fallback
 
 
+# 附录没有数字前缀，按教程约定的顺序排在正文章节之后。
+_APPENDIX_ORDER = {"setup": 0, "glossary": 1, "reading-list": 2, "references": 3}
+
+
+def _sort_key(path: Path) -> tuple:
+    numbered = re.match(r"^(\d{2})-", path.name)
+    if numbered:
+        return (0, int(numbered.group(1)))
+    return (1, _APPENDIX_ORDER.get(path.stem, 99), path.stem)
+
+
 def load_chapters(docs_dir: Path) -> list[Chapter]:
     chapters = []
-    for path in sorted(docs_dir.glob("*.md")):
+    for path in sorted(docs_dir.glob("*.md"), key=_sort_key):
         markdown = path.read_text(encoding="utf-8")
         chapters.append(
             Chapter(
