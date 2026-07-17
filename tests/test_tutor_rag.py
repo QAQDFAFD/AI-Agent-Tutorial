@@ -25,7 +25,9 @@ class FakeEmbeddingClient:
 
 
 CHUNKS = [
-    Chunk("05", "LangGraph", "Checkpoint", "checkpoint", "checkpointer 保存快照，thread 可恢复执行"),
+    Chunk(
+        "05", "LangGraph", "Checkpoint", "checkpoint", "checkpointer 保存快照，thread 可恢复执行"
+    ),
     Chunk("07", "RAG", "切块", "切块", "把长文档切成小块，检索时带出处引用"),
     Chunk("10", "安全", "幂等", "幂等", "写操作使用幂等键防止重复退款"),
 ]
