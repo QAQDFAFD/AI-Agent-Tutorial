@@ -7,6 +7,7 @@ import json
 import logging
 import re
 from collections.abc import AsyncIterator
+from pathlib import Path
 
 import markdown as md
 from fastapi import APIRouter, HTTPException, Request
@@ -24,6 +25,8 @@ router = APIRouter(prefix="/api")
 
 def _rewrite_links(html: str) -> str:
     html = html.replace('src="../assets/', 'src="/assets/').replace('src="assets/', 'src="/assets/')
+    # demos 目录链接改写为站内 Demo 源码查看页
+    html = re.sub(r'href="(?:\.\./)?demos/([\w-]+)/[\w.-]*"', r'href="#/demo/\1"', html)
 
     def to_route(match: re.Match) -> str:
         name = match.group(1)
@@ -41,6 +44,41 @@ def render_chapter_html(chapter: Chapter) -> str:
         extension_configs={"toc": {"slugify": lambda value, separator: slugify(value)}},
     )
     return _rewrite_links(renderer.convert(chapter.markdown))
+
+
+def render_demo_html(demo_name: str, demo_dir: Path) -> str:
+    """把一个 Demo 目录（README + *.py）拼成 Markdown 再渲染，与章节页共用一套样式。"""
+    sections = []
+    readme = demo_dir / "README.md"
+    if readme.exists():
+        sections.append(readme.read_text(encoding="utf-8"))
+    else:
+        sections.append(f"# demos/{demo_name}")
+    for path in sorted(demo_dir.glob("*.py")):
+        code = path.read_text(encoding="utf-8").rstrip()
+        # 文件名用行内代码包裹，防止 __init__.py 的下划线被解析成斜体；
+        # 用四个反引号做围栏，避免源码 docstring 里的 ``` 提前闭合代码块
+        sections.append(f"## `{path.name}`\n\n````python\n{code}\n````")
+    renderer = md.Markdown(
+        extensions=["tables", "fenced_code", "toc"],
+        extension_configs={"toc": {"slugify": lambda value, separator: slugify(value)}},
+    )
+    return _rewrite_links(renderer.convert("\n\n".join(sections)))
+
+
+@router.get("/demos/{demo_name}")
+async def read_demo(demo_name: str, request: Request) -> ChapterContent:
+    # 白名单式校验目录名，杜绝路径穿越
+    if not re.fullmatch(r"[\w-]+", demo_name):
+        raise HTTPException(status_code=404, detail="示例不存在")
+    demo_dir = request.app.state.settings.demos_dir / demo_name
+    if not demo_dir.is_dir():
+        raise HTTPException(status_code=404, detail="示例不存在")
+    return ChapterContent(
+        id=demo_name,
+        title=f"demos/{demo_name}",
+        html=render_demo_html(demo_name, demo_dir),
+    )
 
 
 @router.get("/health")

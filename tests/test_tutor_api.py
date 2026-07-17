@@ -78,6 +78,23 @@ def test_chapters_listing_and_content():
         assert client.get("/api/chapters/nope").status_code == 404
 
 
+def test_demo_page_renders_code_and_rejects_traversal():
+    with TestClient(create_app(_settings(), agent=FakeAgent())) as client:
+        detail = client.get("/api/demos/01_agent_loop").json()
+        assert detail["title"] == "demos/01_agent_loop"
+        assert "language-python" in detail["html"] or "<code" in detail["html"]
+        assert "main.py" in detail["html"]
+        assert client.get("/api/demos/..%2Fdocs").status_code == 404
+        assert client.get("/api/demos/nope").status_code == 404
+
+
+def test_chapter_demo_links_rewritten_to_demo_route():
+    with TestClient(create_app(_settings(), agent=FakeAgent())) as client:
+        html = client.get("/api/chapters/01").json()["html"]
+        assert 'href="#/demo/01_agent_loop"' in html
+        assert "../demos/" not in html
+
+
 def test_chat_streams_expected_event_sequence():
     with (
         TestClient(create_app(_settings(), agent=FakeAgent())) as client,

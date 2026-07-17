@@ -22,20 +22,22 @@ async function loadChapters() {
 }
 
 function currentRoute() {
-  const match = location.hash.match(/^#\/chapter\/([\w.-]+)/);
-  return match ? match[1] : "00";
+  const demo = location.hash.match(/^#\/demo\/([\w-]+)/);
+  if (demo) return { kind: "demo", id: demo[1] };
+  const chapter = location.hash.match(/^#\/chapter\/([\w.-]+)/);
+  return { kind: "chapter", id: chapter ? chapter[1] : "00" };
 }
 
-async function renderChapter(chapterId, anchor) {
-  const response = await fetch(`/api/chapters/${encodeURIComponent(chapterId)}`);
+async function renderPage(url, activeChapterId, anchor) {
+  const response = await fetch(url);
   if (!response.ok) {
-    chapterBody.innerHTML = "<p>章节不存在。</p>";
+    chapterBody.innerHTML = "<p>页面不存在。</p>";
     return;
   }
-  const chapter = await response.json();
-  chapterBody.innerHTML = chapter.html;
+  const page = await response.json();
+  chapterBody.innerHTML = page.html;
   for (const link of chapterList.querySelectorAll("a")) {
-    link.classList.toggle("active", link.dataset.chapterId === chapterId);
+    link.classList.toggle("active", link.dataset.chapterId === activeChapterId);
   }
   sidebar.classList.remove("open");
   const target = anchor && document.getElementById(anchor);
@@ -43,8 +45,17 @@ async function renderChapter(chapterId, anchor) {
   if (!target) window.scrollTo({ top: 0 });
 }
 
+function renderChapter(chapterId, anchor) {
+  return renderPage(`/api/chapters/${encodeURIComponent(chapterId)}`, chapterId, anchor);
+}
+
 function route() {
-  renderChapter(currentRoute());
+  const { kind, id } = currentRoute();
+  if (kind === "demo") {
+    renderPage(`/api/demos/${encodeURIComponent(id)}`, null);
+  } else {
+    renderChapter(id);
+  }
 }
 
 window.addEventListener("hashchange", route);

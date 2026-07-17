@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     tutor_embedding_model: str = "text-embedding-3-small"
 
     docs_dir: Path = Path("docs")
+    demos_dir: Path = Path("demos")
     assets_dir: Path = Path("assets")
     cache_dir: Path = Path("var")
 
